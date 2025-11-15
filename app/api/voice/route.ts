@@ -1,10 +1,6 @@
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js"
 import { NextRequest, NextResponse } from "next/server"
 
-const elevenlabs = new ElevenLabsClient({
-  apiKey: process.env.ELEVENLABS_API_KEY,
-})
-
 export async function POST(request: NextRequest) {
   try {
     const { text } = await request.json()
@@ -12,6 +8,19 @@ export async function POST(request: NextRequest) {
     if (!text) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 })
     }
+
+    // Initialize client here to avoid build-time errors
+    if (!process.env.ELEVENLABS_API_KEY) {
+      console.error("ELEVENLABS_API_KEY is not set");
+      return NextResponse.json(
+        { error: "Text-to-speech service not configured" },
+        { status: 500 }
+      );
+    }
+
+    const elevenlabs = new ElevenLabsClient({
+      apiKey: process.env.ELEVENLABS_API_KEY,
+    });
 
     const audio = await elevenlabs.textToSpeech.convert("6XVxc5pFxXre3breYJhP", {
       text,
