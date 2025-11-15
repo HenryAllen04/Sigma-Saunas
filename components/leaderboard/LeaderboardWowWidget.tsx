@@ -289,13 +289,26 @@ function CustomTooltip(props: any) {
 	}
 	if (!active || !payload || payload.length === 0) return null
 	const row = payload[0].payload
+	const [src, setSrc] = React.useState<string>(row.avatar)
+	const [attempt, setAttempt] = React.useState<number>(0)
+	const onError = React.useCallback(() => {
+		if (attempt >= 2) return
+		const next = (() => {
+			if (src.endsWith(".png")) return src.replace(/\.png$/i, ".jpg")
+			if (src.endsWith(".jpg")) return src.replace(/\.jpg$/i, ".png")
+			if (src.endsWith(".jpeg")) return src.replace(/\.jpeg$/i, ".png")
+			return `${src}.png`
+		})()
+		setAttempt((a) => a + 1)
+		setSrc(next)
+	}, [attempt, src])
 	return (
 		<div
 			className="surface-glass px-3 py-2 text-xs"
 		>
 			<div className="mb-2 flex items-center gap-2">
 				<Avatar className="h-6 w-6 ring-1 ring-white/10">
-					<AvatarImage src={row.avatar} alt={label} />
+					<AvatarImage src={src} alt={label} onError={onError} />
 					<AvatarFallback>{(label as string)?.slice(0, 2)?.toUpperCase()}</AvatarFallback>
 				</Avatar>
 				<div className="font-medium">{label}</div>

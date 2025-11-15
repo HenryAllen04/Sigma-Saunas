@@ -26,6 +26,7 @@ export default function Page() {
 				id: u.id,
 				name: u.name,
 				avatar: u.avatar,
+				rank: u.rank,
 				maxTemp: u.maxTemp,
 				totalMinutes: u.totalMinutes,
 				streak: u.streak,

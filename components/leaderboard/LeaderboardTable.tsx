@@ -3,14 +3,15 @@
 import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LeaderboardRow } from "./LeaderboardRow"
 import { Separator } from "@/components/ui/separator"
+import { AvatarWithFallback } from "./AvatarWithFallback"
 
 export type LeaderboardUser = {
 	id: string
 	name: string
 	avatar: string
+	rank?: number
 	maxTemp: number
 	totalMinutes: number
 	streak: number
@@ -38,10 +39,12 @@ function MobileList(props: { users: LeaderboardUser[] }) {
 							<div className="flex items-center gap-3">
 								<span className="text-sm font-semibold text-white/70">#{rank}</span>
 								<div className={isTop ? "rounded-full p-[2px] bg-gradient-to-r from-white/20 via-white/5 to-transparent" : ""}>
-									<Avatar className="h-8 w-8 ring-1 ring-white/10">
-										<AvatarImage src={u.avatar} alt={u.name} />
-										<AvatarFallback>{u.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-									</Avatar>
+									<AvatarWithFallback
+										className="h-12 w-12"
+										src={u.avatar}
+										alt={u.name}
+										fallbackText={u.name.slice(0, 2).toUpperCase()}
+									/>
 								</div>
 								<span className="text-sm">{u.name}</span>
 							</div>
@@ -72,7 +75,12 @@ function MobileList(props: { users: LeaderboardUser[] }) {
 export function LeaderboardTable(props: LeaderboardTableProps) {
 	const { title = "Leaderboard", description = "Track sauna streaks and performance.", users } = props
 	const sorted = React.useMemo(() => {
-		return [...users].sort((a, b) => b.streak - a.streak)
+		const allHaveRank = users.every((u) => typeof u.rank === "number")
+		if (allHaveRank) {
+			return [...users].sort((a, b) => (a.rank! - b.rank!))
+		}
+		// If rank is not provided, keep original order
+		return [...users]
 	}, [users])
 
 	return (

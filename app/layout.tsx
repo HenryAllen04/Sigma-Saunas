@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 import { Inter } from "next/font/google";
-import { VibeKanbanProvider } from "@/components/vibe-kanban-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,7 +34,6 @@ export default function RootLayout({
         <div className="relative z-20">
           {children}
         </div>
-        <VibeKanbanProvider />
       </body>
     </html>
   );

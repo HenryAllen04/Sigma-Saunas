@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { AvatarWithFallback } from "./AvatarWithFallback"
 
 export type LeaderboardRowProps = {
 	user: {
@@ -41,10 +41,12 @@ export function LeaderboardRow(props: LeaderboardRowProps) {
 								: "bg-transparent"
 						)}
 					>
-						<Avatar className="h-8 w-8 ring-1 ring-white/10">
-							<AvatarImage src={user.avatar} alt={user.name} />
-							<AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-						</Avatar>
+						<AvatarWithFallback
+							className="h-12 w-12"
+							src={user.avatar}
+							alt={user.name}
+							fallbackText={user.name.slice(0, 2).toUpperCase()}
+						/>
 					</div>
 					<span className={cn(isTop ? "font-semibold text-white" : "text-white/90")}>
 						{user.name}
