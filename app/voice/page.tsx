@@ -7,11 +7,14 @@ import {
   getHealthDataStream,
   type HealthData
 } from "@/lib/mockHealthData"
-import {
-  getCurrentSaunaData,
-  getSaunaDataStream,
-  type SaunaData
-} from "@/lib/mockSaunaData"
+
+// Real sauna data types (from Harvia API)
+interface SaunaData {
+  temperature: number
+  humidity: number
+  presence: boolean
+  timestamp: Date
+}
 import { Play, Square, Heart, Thermometer, Activity, Mic } from "lucide-react"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -56,19 +59,34 @@ export default function VoicePage() {
   const sessionDurationRef = useRef<number>(0)
 
   useEffect(() => {
-    // Initialize with current data
+    // Initialize with current health data (mock)
     const initialHealthData = getCurrentHealthData()
-    const initialSaunaData = getCurrentSaunaData()
-
     console.log("🏥 Initializing health data:", initialHealthData)
-    console.log("🧖 Initializing sauna data:", initialSaunaData)
-
     setHealthData(initialHealthData)
-    setSaunaData(initialSaunaData)
-
-    // Also set refs for immediate access
     healthDataRef.current = initialHealthData
-    saunaDataRef.current = initialSaunaData
+
+    // Fetch initial sauna data from real API
+    const fetchInitialSaunaData = async () => {
+      try {
+        const response = await fetch('/api/sensor/current')
+        if (response.ok) {
+          const data = await response.json()
+          const saunaData: SaunaData = {
+            temperature: data.data.temp || 0,
+            humidity: data.data.hum || 0,
+            presence: data.data.presence === 1,
+            timestamp: new Date()
+          }
+          console.log("🧖 Initializing sauna data:", saunaData)
+          setSaunaData(saunaData)
+          saunaDataRef.current = saunaData
+        }
+      } catch (error) {
+        console.error("Failed to fetch initial sauna data:", error)
+      }
+    }
+
+    fetchInitialSaunaData()
 
     // Initialize speech recognition
     if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
@@ -380,16 +398,40 @@ export default function VoicePage() {
       }
     }
 
-    // Start data streams
+    // Start health data stream (mock)
     healthStreamRef.current = getHealthDataStream((data) => {
       setHealthData(data)
       healthDataRef.current = data
     }, 5000)
 
-    saunaStreamRef.current = getSaunaDataStream((data) => {
-      setSaunaData(data)
-      saunaDataRef.current = data
-    }, 5000)
+    // Start real sauna data stream using SSE
+    const eventSource = new EventSource('/api/sensor/stream')
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        const saunaData: SaunaData = {
+          temperature: data.data.temp || 0,
+          humidity: data.data.hum || 0,
+          presence: data.data.presence === 1,
+          timestamp: new Date()
+        }
+        setSaunaData(saunaData)
+        saunaDataRef.current = saunaData
+      } catch (error) {
+        console.error("Error parsing sauna data:", error)
+      }
+    }
+
+    eventSource.onerror = (error) => {
+      console.error("SSE error:", error)
+      eventSource.close()
+    }
+
+    // Store cleanup function
+    saunaStreamRef.current = () => {
+      eventSource.close()
+    }
 
     // Initial guidance
     if (healthData && saunaData) {
@@ -630,8 +672,10 @@ export default function VoicePage() {
           {/* Safety Notice */}
           <div className="bg-muted/50 border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground">
-              This is a demonstration with mock data. Always consult with a healthcare professional
-              before starting a sauna routine, especially if you have any medical conditions.
+              Sauna temperature and humidity are real-time data from your Harvia sauna.
+              Health metrics (heart rate, HRV) are currently simulated for demonstration.
+              Always consult with a healthcare professional before starting a sauna routine,
+              especially if you have any medical conditions.
             </p>
           </div>
         </div>

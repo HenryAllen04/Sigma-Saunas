@@ -15,12 +15,17 @@ export async function POST(request: NextRequest) {
 
     const audio = await elevenlabs.textToSpeech.convert("6XVxc5pFxXre3breYJhP", {
       text,
-      model_id: "eleven_multilingual_v2",
+      modelId: "eleven_multilingual_v2",
     })
 
+    // Convert ReadableStream to Buffer
+    const reader = audio.getReader()
     const chunks: Uint8Array[] = []
-    for await (const chunk of audio) {
-      chunks.push(chunk)
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      chunks.push(value)
     }
 
     const audioBuffer = Buffer.concat(chunks)

@@ -97,7 +97,7 @@ export interface Session {
   timestamp: string;
   type?: string;
   durationMs?: number;
-  stats?: Record<string, unknown>;
+  stats?: string; // Stringified JSON that must be parsed
 }
 
 export interface SessionsResponse {
