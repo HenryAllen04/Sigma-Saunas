@@ -3,9 +3,6 @@ const nextConfig = {
   // Optimize package imports for faster compilation
   transpilePackages: ['recharts'],
   
-  // Enable SWC minification (default in Next.js 15, but explicit is good)
-  swcMinify: true,
-  
   // Optimize module resolution
   modularizeImports: {
     'lucide-react': {
