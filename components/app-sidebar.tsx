@@ -32,8 +32,8 @@ import {
 
 const data = {
   user: {
-    name: "Alex Chen",
-    email: "alex@sigmasaunas.com",
+    name: "Perttu Rönkkö",
+    email: "perttu@sigmasaunas.com",
     avatar: "",
   },
   navMain: [
