@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 import { Inter } from "next/font/google";
+import { VibeKanbanProvider } from "@/components/vibe-kanban-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
+        <VibeKanbanProvider />
         <BackgroundGradientAnimation
           gradientBackgroundStart="#1b0e07"
           gradientBackgroundEnd="#120a05"
