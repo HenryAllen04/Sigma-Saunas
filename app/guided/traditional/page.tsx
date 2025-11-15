@@ -5,8 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Sparkles } from "lucide-react";
-import Link from "next/link";
+ 
 
 export default function Page() {
   return (
@@ -25,13 +24,7 @@ export default function Page() {
                 <p className="text-sm text-white/60">Classic heat experience</p>
               </div>
             </div>
-            <Link
-              href="#"
-              className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm text-white/80 backdrop-blur-md hover:bg-white/15"
-            >
-              <Sparkles className="h-4 w-4" />
-              Profile
-            </Link>
+            
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-6 px-6 md:px-12 pb-10">

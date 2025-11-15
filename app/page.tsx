@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { GlassCard } from "@/components/ui/glass-card";
 import { EmberGlow } from "@/components/ui/ember-glow";
-import { Thermometer, Droplets, User, Sparkles, Activity, Heart } from "lucide-react";
+import { Thermometer, Droplets, User, Activity, Heart } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -163,13 +163,7 @@ export default function Page() {
                 <p className="text-sm text-white/60">Ready for a session?</p>
               </div>
             </div>
-            <Link
-              href="#"
-              className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm text-white/80 backdrop-blur-md hover:bg-white/15"
-            >
-              <Sparkles className="h-4 w-4" />
-              Profile
-            </Link>
+            
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-6 px-6 md:px-12 pb-10">
