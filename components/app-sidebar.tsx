@@ -2,20 +2,19 @@
 
 import * as React from "react"
 import {
-  BookOpen,
-  Bot,
   Command,
-  Frame,
+  Compass,
+  Flame,
+  History,
   LifeBuoy,
-  Map,
-  PieChart,
   Send,
   Settings2,
   SquareTerminal,
+  Trophy,
+  User,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -36,87 +35,94 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "Dashboard",
+      url: "/dashboard",
       icon: SquareTerminal,
       isActive: true,
+    },
+    {
+      title: "Live Session",
+      url: "/live",
+      icon: Flame,
+    },
+    {
+      title: "Guided Sessions",
+      url: "/guided",
+      icon: Compass,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Traditional",
+          url: "/guided/traditional",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Zen",
+          url: "/guided/zen",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Recovery",
+          url: "/guided/recovery",
+        },
+        {
+          title: "Coding Mode",
+          url: "/guided/coding-mode",
+        },
+        {
+          title: "Corporate",
+          url: "/guided/corporate",
+        },
+        {
+          title: "Beginner Safe Mode",
+          url: "/guided/beginner",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      title: "Session History",
+      url: "/history",
+      icon: History,
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
+      title: "Social & Leaderboard",
+      url: "/social",
+      icon: Trophy,
       items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
+        { title: "Weekly", url: "/social?tab=weekly" },
+        { title: "All-Time", url: "/social?tab=all-time" },
+        { title: "Streaks", url: "/social?tab=streaks" },
+        { title: "Friends Only", url: "/social?tab=friends" },
       ],
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: Settings2,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Profile",
+          url: "/settings/profile",
         },
         {
-          title: "Team",
-          url: "#",
+          title: "Integrations",
+          url: "/settings/integrations",
         },
         {
-          title: "Billing",
-          url: "#",
+          title: "Notifications",
+          url: "/settings/notifications",
         },
         {
-          title: "Limits",
-          url: "#",
+          title: "Safety",
+          url: "/settings/safety",
+        },
+      ],
+    },
+    {
+      title: "User Account",
+      url: "/account",
+      icon: User,
+      items: [
+        {
+          title: "Subscription",
+          url: "/account/subscription",
         },
       ],
     },
@@ -133,28 +139,14 @@ const data = {
       icon: Send,
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar variant="inset" {...props}>
+    <div className="relative rounded-2xl">
+      {/* Orange/Gold subtle glow around the sidebar frame */}
+      <div className="absolute inset-0 -z-10 rounded-2xl pointer-events-none [box-shadow:0_0_120px_30px_rgba(255,165,60,0.12)]" />
+      <Sidebar variant="inset" className="bg-transparent backdrop-blur-md" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -164,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
+                  <span className="truncate font-medium">SigmaSaunas</span>
                   <span className="truncate text-xs">Enterprise</span>
                 </div>
               </a>
@@ -174,12 +166,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
-    </Sidebar>
+      </Sidebar>
+    </div>
   )
 }
+
