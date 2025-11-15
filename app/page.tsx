@@ -10,7 +10,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { EmberGlow } from "@/components/ui/ember-glow";
 import { Thermometer, Droplets, User, Activity, Heart } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   LatestDataResponse,
   TelemetryHistoryResponse,
@@ -93,9 +93,9 @@ export default function Page() {
     };
   }, []);
 
-  // Format chart data
-  const formatChartData = (data: TelemetryMeasurement[]) => {
-    return data.map((item) => ({
+  // Format chart data - memoized to prevent re-rendering on every sensorData update
+  const chartData = useMemo(() => {
+    return historyData.map((item) => ({
       time: new Date(parseInt(item.timestamp)).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -103,7 +103,7 @@ export default function Page() {
       temperature: item.data?.temp,
       humidity: item.data?.hum,
     }));
-  };
+  }, [historyData]);
 
   // Helper: Format duration in milliseconds to HH:MM
   const formatDuration = (durationMs?: number) => {
@@ -290,7 +290,7 @@ export default function Page() {
                 </div>
                 {historyData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={formatChartData(historyData)}>
+                    <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                       <XAxis
                         dataKey="time"
