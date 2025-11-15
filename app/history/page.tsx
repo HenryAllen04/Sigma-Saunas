@@ -95,7 +95,7 @@ export default function Page() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white/70">Total Sessions</p>
-                    <p className="text-3xl font-bold mt-2 text-orange-200">{sessions.length}</p>
+                    <p className="text-3xl font-bold mt-2">{sessions.length}</p>
                   </div>
                   <Calendar className="h-5 w-5 text-white/40" />
                 </div>
@@ -107,7 +107,7 @@ export default function Page() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white/70">Total Time</p>
-                    <p className="text-3xl font-bold mt-2 text-orange-200">
+                    <p className="text-3xl font-bold mt-2">
                       {totalHours}h {totalMinutes % 60}m
                     </p>
                   </div>
@@ -121,7 +121,7 @@ export default function Page() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white/70">Avg Duration</p>
-                    <p className="text-3xl font-bold mt-2 text-orange-200">
+                    <p className="text-3xl font-bold mt-2">
                       {avgHours > 0 ? `${avgHours}h ${avgRemainingMinutes}m` : `${avgRemainingMinutes}m`}
                     </p>
                   </div>
@@ -135,7 +135,7 @@ export default function Page() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white/70">Max Temp</p>
-                    <p className="text-3xl font-bold mt-2 text-orange-200">{maxTemp.toFixed(0)}°C</p>
+                    <p className="text-3xl font-bold mt-2">{maxTemp.toFixed(0)}°C</p>
                   </div>
                   <Thermometer className="h-5 w-5 text-white/40" />
                 </div>
