@@ -557,11 +557,15 @@ export default function VoicePage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Temperature</span>
-                  <span className="text-xl font-semibold">{saunaData?.temperature || "--"}°C</span>
+                  <span className="text-xl font-semibold">
+                    {saunaData?.temperature ? saunaData.temperature.toFixed(1) : "--"}°C
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Humidity</span>
-                  <span className="text-xl font-semibold">{saunaData?.humidity || "--"}%</span>
+                  <span className="text-xl font-semibold">
+                    {saunaData?.humidity ? saunaData.humidity.toFixed(1) : "--"}%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Presence</span>
@@ -673,7 +677,7 @@ export default function VoicePage() {
           <div className="bg-muted/50 border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground">
               Sauna temperature and humidity are real-time data from your Harvia sauna.
-              Health metrics (heart rate, HRV) are currently simulated for demonstration.
+              Health metrics (heart rate, HRV) are pulled from apple watch data.
               Always consult with a healthcare professional before starting a sauna routine,
               especially if you have any medical conditions.
             </p>
