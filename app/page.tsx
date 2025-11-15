@@ -10,7 +10,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { EmberGlow } from "@/components/ui/ember-glow";
 import { Thermometer, Droplets, User, Activity, Heart } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 import {
   LatestDataResponse,
   TelemetryHistoryResponse,
@@ -27,6 +27,72 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+
+// Memoized chart component to prevent re-renders when parent updates
+const HistoricalChart = memo(({ data }: { data: Array<{ time: string; temperature?: number; humidity?: number }> }) => {
+  if (data.length === 0) {
+    return (
+      <div className="flex h-[300px] items-center justify-center text-white/40">
+        <p className="text-sm">Loading data...</p>
+      </div>
+    );
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+        <XAxis
+          dataKey="time"
+          tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }}
+          stroke="rgba(255,255,255,0.2)"
+          interval="preserveStartEnd"
+        />
+        <YAxis
+          yAxisId="temp"
+          orientation="left"
+          tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }}
+          stroke="rgba(255,255,255,0.2)"
+        />
+        <YAxis
+          yAxisId="humidity"
+          orientation="right"
+          tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }}
+          stroke="rgba(255,255,255,0.2)"
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "rgba(0,0,0,0.8)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "8px",
+            color: "#fff",
+          }}
+        />
+        <Legend wrapperStyle={{ color: "rgba(255,255,255,0.8)" }} />
+        <Line
+          yAxisId="temp"
+          type="monotone"
+          dataKey="temperature"
+          stroke="#ff9a1f"
+          name="Temperature (°C)"
+          strokeWidth={2}
+          dot={false}
+        />
+        <Line
+          yAxisId="humidity"
+          type="monotone"
+          dataKey="humidity"
+          stroke="#60a5fa"
+          name="Humidity (%)"
+          strokeWidth={2}
+          dot={false}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+});
+
+HistoricalChart.displayName = 'HistoricalChart';
 
 export default function Page() {
   const [sensorData, setSensorData] = useState<LatestDataResponse | null>(null);
@@ -93,9 +159,9 @@ export default function Page() {
     };
   }, []);
 
-  // Format chart data
-  const formatChartData = (data: TelemetryMeasurement[]) => {
-    return data.map((item) => ({
+  // Format chart data - memoized to prevent re-rendering on every sensorData update
+  const chartData = useMemo(() => {
+    return historyData.map((item) => ({
       time: new Date(parseInt(item.timestamp)).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -103,7 +169,7 @@ export default function Page() {
       temperature: item.data?.temp,
       humidity: item.data?.hum,
     }));
-  };
+  }, [historyData]);
 
   // Helper: Format duration in milliseconds to HH:MM
   const formatDuration = (durationMs?: number) => {
@@ -288,62 +354,7 @@ export default function Page() {
                   </div>
                   <Activity className="h-5 w-5 text-white/40" />
                 </div>
-                {historyData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={formatChartData(historyData)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                      <XAxis
-                        dataKey="time"
-                        tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }}
-                        stroke="rgba(255,255,255,0.2)"
-                        interval="preserveStartEnd"
-                      />
-                      <YAxis
-                        yAxisId="temp"
-                        orientation="left"
-                        tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }}
-                        stroke="rgba(255,255,255,0.2)"
-                      />
-                      <YAxis
-                        yAxisId="humidity"
-                        orientation="right"
-                        tick={{ fontSize: 11, fill: "rgba(255,255,255,0.6)" }}
-                        stroke="rgba(255,255,255,0.2)"
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "rgba(0,0,0,0.8)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                          borderRadius: "8px",
-                          color: "#fff",
-                        }}
-                      />
-                      <Legend wrapperStyle={{ color: "rgba(255,255,255,0.8)" }} />
-                      <Line
-                        yAxisId="temp"
-                        type="monotone"
-                        dataKey="temperature"
-                        stroke="#ff9a1f"
-                        name="Temperature (°C)"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                      <Line
-                        yAxisId="humidity"
-                        type="monotone"
-                        dataKey="humidity"
-                        stroke="#60a5fa"
-                        name="Humidity (%)"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="flex h-[300px] items-center justify-center text-white/40">
-                    <p className="text-sm">Loading data...</p>
-                  </div>
-                )}
+                <HistoricalChart data={chartData} />
               </GlassCard>
             </EmberGlow>
 
