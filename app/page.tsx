@@ -697,8 +697,8 @@ export default function Page() {
           {/* Lower grid: Weekly Progress & Insight */}
           <div className="grid gap-6 md:grid-cols-3 md:items-stretch">
             {/* Weekly Progress */}
-            <EmberGlow className="md:col-span-2 h-full">
-              <GlassCard className="p-5 h-full">
+            <EmberGlow className="md:col-span-2">
+              <GlassCard className="p-5">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="text-base font-medium">Sauna Time This Week</h3>
                   <span className="text-sm text-white/60">{weeklyMinutes} minutes • +12%</span>
