@@ -1,6 +1,8 @@
 "use client";
 
 import { AppSidebar } from "@/components/app-sidebar";
+import { EmberGlow } from "@/components/ui/ember-glow";
+import { GlassCard } from "@/components/ui/glass-card";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -250,7 +252,7 @@ export default function Page() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="bg-transparent">
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
@@ -321,266 +323,280 @@ export default function Page() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {/* Error banner */}
           {error && (
-            <div className="rounded-lg bg-destructive/15 p-4 text-destructive">
-              <p className="text-sm font-medium">Error: {error}</p>
-            </div>
+            <EmberGlow className="rounded-xl">
+              <GlassCard className="p-4 text-destructive bg-destructive/10 border-destructive/20">
+                <p className="text-sm font-medium">Error: {error}</p>
+              </GlassCard>
+            </EmberGlow>
           )}
 
           {/* Sensor cards */}
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             {/* Temperature card */}
-            <div className="rounded-xl border bg-card p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Temperature
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {sensorData?.data?.temp !== undefined
-                      ? `${sensorData.data.temp.toFixed(1)}°C`
-                      : "--"}
-                  </p>
+            <EmberGlow>
+              <GlassCard className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">
+                      Temperature
+                    </p>
+                    <p className="text-3xl font-bold">
+                      {sensorData?.data?.temp !== undefined
+                        ? `${sensorData.data.temp.toFixed(1)}°C`
+                        : "--"}
+                    </p>
+                  </div>
+                  <Thermometer className="h-8 w-8 text-orange-400" />
                 </div>
-                <Thermometer className="h-8 w-8 text-orange-500" />
-              </div>
-            </div>
+              </GlassCard>
+            </EmberGlow>
 
             {/* Humidity card */}
-            <div className="rounded-xl border bg-card p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Humidity
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {sensorData?.data?.hum !== undefined
-                      ? `${sensorData.data.hum.toFixed(1)}%`
-                      : "--"}
-                  </p>
+            <EmberGlow>
+              <GlassCard className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">
+                      Humidity
+                    </p>
+                    <p className="text-3xl font-bold">
+                      {sensorData?.data?.hum !== undefined
+                        ? `${sensorData.data.hum.toFixed(1)}%`
+                        : "--"}
+                    </p>
+                  </div>
+                  <Droplets className="h-8 w-8 text-blue-300" />
                 </div>
-                <Droplets className="h-8 w-8 text-blue-500" />
-              </div>
-            </div>
+              </GlassCard>
+            </EmberGlow>
 
             {/* Presence card */}
-            <div className="rounded-xl border bg-card p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Motion
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {sensorData?.data?.presence !== undefined
-                      ? sensorData.data.presence > 0
-                        ? "Detected"
-                        : "None"
-                      : "--"}
-                  </p>
-                  {sensorData?.data?.presence !== undefined &&
-                    sensorData.data.presence > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Level: {sensorData.data.presence}
-                      </p>
-                    )}
+            <EmberGlow>
+              <GlassCard className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">
+                      Motion
+                    </p>
+                    <p className="text-3xl font-bold">
+                      {sensorData?.data?.presence !== undefined
+                        ? sensorData.data.presence > 0
+                          ? "Detected"
+                          : "None"
+                        : "--"}
+                    </p>
+                    {sensorData?.data?.presence !== undefined &&
+                      sensorData.data.presence > 0 && (
+                        <p className="text-xs text-white/60 mt-1">
+                          Level: {sensorData.data.presence}
+                        </p>
+                      )}
+                  </div>
+                  <User
+                    className={`h-8 w-8 ${
+                      sensorData?.data?.presence && sensorData.data.presence > 0
+                        ? "text-green-400"
+                        : "text-gray-400"
+                    }`}
+                  />
                 </div>
-                <User
-                  className={`h-8 w-8 ${
-                    sensorData?.data?.presence && sensorData.data.presence > 0
-                      ? "text-green-500"
-                      : "text-gray-400"
-                  }`}
-                />
-              </div>
-            </div>
+              </GlassCard>
+            </EmberGlow>
           </div>
 
           {/* Session History */}
           {sessions.length > 0 && (
-            <div className="rounded-xl border bg-card p-6">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold">Session History</h3>
-                <p className="text-sm text-muted-foreground">
-                  Recent sauna sessions (last 7 days)
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {sessions.slice(0, 4).map((session) => {
-                  const stats = session.stats ? JSON.parse(session.stats as string) : {};
-                  return (
-                    <div
-                      key={session.sessionId}
-                      className="rounded-lg border bg-card/50 p-4"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">
-                          {new Date(session.timestamp).toLocaleDateString()} at{" "}
-                          {new Date(session.timestamp).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="text-2xl font-bold">
-                          {formatDuration(session.durationMs)}
-                        </div>
-
-                        {stats.temp && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Max temp:</span>
-                            <span className="font-medium">
-                              {stats.temp.max?.toFixed(1)}°C
-                            </span>
-                          </div>
-                        )}
-
-                        {stats.temp && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Avg temp:</span>
-                            <span className="font-medium">
-                              {stats.temp.avg?.toFixed(1)}°C
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Historical data chart */}
-          <div className="rounded-xl border bg-card p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold">Sensor History</h3>
-                <p className="text-sm text-muted-foreground">
-                  Last 24 hours of temperature and humidity data
-                </p>
-              </div>
-              <Activity className="h-5 w-5 text-muted-foreground" />
-            </div>
-
-            {historyData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={formatChartData(historyData)}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="time"
-                    tick={{ fontSize: 12 }}
-                    interval="preserveStartEnd"
-                  />
-                  <YAxis yAxisId="temp" orientation="left" tick={{ fontSize: 12 }} />
-                  <YAxis yAxisId="humidity" orientation="right" tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    yAxisId="temp"
-                    type="monotone"
-                    dataKey="temperature"
-                    stroke="#f97316"
-                    name="Temperature (°C)"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                  <Line
-                    yAxisId="humidity"
-                    type="monotone"
-                    dataKey="humidity"
-                    stroke="#3b82f6"
-                    name="Humidity (%)"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-                <p>Loading historical data...</p>
-              </div>
-            )}
-          </div>
-
-          {/* Events Timeline */}
-          {events.length > 0 && (
-            <div className="rounded-xl border bg-card p-6">
-              <button
-                onClick={() => setShowEvents(!showEvents)}
-                className="w-full flex items-center justify-between mb-4"
-              >
-                <div>
-                  <h3 className="text-lg font-semibold text-left">
-                    Events & Alerts ({events.length})
-                  </h3>
-                  <p className="text-sm text-muted-foreground text-left">
-                    Device events from the last 7 days
+            <EmberGlow>
+              <GlassCard className="p-6">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Session History</h3>
+                  <p className="text-sm text-white/60">
+                    Recent sauna sessions (last 7 days)
                   </p>
                 </div>
-                {showEvents ? (
-                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                )}
-              </button>
 
-              {showEvents && (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {events.slice(0, 10).map((event, index) => (
-                    <div
-                      key={`${event.deviceId}-${event.timestamp}-${index}`}
-                      className="flex items-start gap-3 p-3 rounded-lg border bg-card/50"
-                    >
-                      <AlertCircle
-                        className={`h-5 w-5 mt-0.5 flex-shrink-0 ${getSeverityColor(
-                          event.severity
-                        )}`}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm font-medium">
-                            {event.displayName || event.eventId}
-                          </p>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            {formatEventTime(event.timestamp)}
+                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {sessions.slice(0, 4).map((session) => {
+                    const stats = session.stats ? JSON.parse(session.stats as string) : {};
+                    return (
+                      <div
+                        key={session.sessionId}
+                        className="rounded-lg border border-white/10 bg-white/[0.04] p-4"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Clock className="h-4 w-4 text-white/60" />
+                          <span className="text-sm font-medium">
+                            {new Date(session.timestamp).toLocaleDateString()} at{" "}
+                            {new Date(session.timestamp).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </span>
                         </div>
 
-                        {event.metadata && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {event.metadata}
-                          </p>
-                        )}
+                        <div className="space-y-1">
+                          <div className="text-2xl font-bold">
+                            {formatDuration(session.durationMs)}
+                          </div>
 
-                        <div className="flex items-center gap-2 mt-1">
-                          <span
-                            className={`text-xs px-2 py-0.5 rounded-full border ${
-                              event.type === "SENSOR"
-                                ? "border-blue-500/50 text-blue-500"
-                                : "border-gray-500/50 text-gray-500"
-                            }`}
-                          >
-                            {event.type}
-                          </span>
-                          {event.severity && (
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded-full border ${getSeverityColor(
-                                event.severity
-                              )}`}
-                            >
-                              {event.severity}
-                            </span>
+                          {stats.temp && (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-white/60">Max temp:</span>
+                              <span className="font-medium">
+                                {stats.temp.max?.toFixed(1)}°C
+                              </span>
+                            </div>
+                          )}
+
+                          {stats.temp && (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-white/60">Avg temp:</span>
+                              <span className="font-medium">
+                                {stats.temp.avg?.toFixed(1)}°C
+                              </span>
+                            </div>
                           )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+                </div>
+              </GlassCard>
+            </EmberGlow>
+          )}
+
+          {/* Historical data chart */}
+          <EmberGlow>
+            <GlassCard className="p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Sensor History</h3>
+                  <p className="text-sm text-white/60">
+                    Last 24 hours of temperature and humidity data
+                  </p>
+                </div>
+                <Activity className="h-5 w-5 text-white/60" />
+              </div>
+
+              {historyData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart data={formatChartData(historyData)}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="time"
+                      tick={{ fontSize: 12 }}
+                      interval="preserveStartEnd"
+                    />
+                    <YAxis yAxisId="temp" orientation="left" tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="humidity" orientation="right" tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      yAxisId="temp"
+                      type="monotone"
+                      dataKey="temperature"
+                      stroke="#f59e0b"
+                      name="Temperature (°C)"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      yAxisId="humidity"
+                      type="monotone"
+                      dataKey="humidity"
+                      stroke="#60a5fa"
+                      name="Humidity (%)"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-[400px] items-center justify-center text-white/60">
+                  <p>Loading historical data...</p>
                 </div>
               )}
-            </div>
+            </GlassCard>
+          </EmberGlow>
+
+          {/* Events Timeline */}
+          {events.length > 0 && (
+            <EmberGlow>
+              <GlassCard className="p-6">
+                <button
+                  onClick={() => setShowEvents(!showEvents)}
+                  className="w-full flex items-center justify-between mb-4"
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-left">
+                      Events & Alerts ({events.length})
+                    </h3>
+                    <p className="text-sm text-white/60 text-left">
+                      Device events from the last 7 days
+                    </p>
+                  </div>
+                  {showEvents ? (
+                    <ChevronUp className="h-5 w-5 text-white/60" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-white/60" />
+                  )}
+                </button>
+
+                {showEvents && (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {events.slice(0, 10).map((event, index) => (
+                      <div
+                        key={`${event.deviceId}-${event.timestamp}-${index}`}
+                        className="flex items-start gap-3 p-3 rounded-lg border border-white/10 bg-white/[0.04]"
+                      >
+                        <AlertCircle
+                          className={`h-5 w-5 mt-0.5 flex-shrink-0 ${getSeverityColor(
+                            event.severity
+                          )}`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm font-medium">
+                              {event.displayName || event.eventId}
+                            </p>
+                            <span className="text-xs text-white/60 whitespace-nowrap">
+                              {formatEventTime(event.timestamp)}
+                            </span>
+                          </div>
+
+                          {event.metadata && (
+                            <p className="text-xs text-white/60 mt-1">
+                              {event.metadata}
+                            </p>
+                          )}
+
+                          <div className="flex items-center gap-2 mt-1">
+                            <span
+                              className={`text-xs px-2 py-0.5 rounded-full border ${
+                                event.type === "SENSOR"
+                                  ? "border-blue-500/50 text-blue-400"
+                                  : "border-gray-500/50 text-gray-400"
+                              }`}
+                            >
+                              {event.type}
+                            </span>
+                            {event.severity && (
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full border ${getSeverityColor(
+                                  event.severity
+                                )}`}
+                              >
+                                {event.severity}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </GlassCard>
+            </EmberGlow>
           )}
 
           {/* Last updated */}

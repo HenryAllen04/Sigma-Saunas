@@ -19,30 +19,18 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={inter.className}>
         <BackgroundGradientAnimation
-          colors={[
-            "#260600", // deep red-brown
-            "#4a1406", // dark ember
-            "#7a1f00", // ember red
-            "#a63a00", // red-orange
-            "#d45100", // molten orange
-            "#ff6a00", // bright orange
-            "#ff9a1f", // naples yellow
-            "#ffd34d"  // warm yellow glow
-          ]}
-          size={800}
-          blur={320}
-          speed={0.4}
-          opacity={0.85}
-          gradientBackgroundStart="#0b0302"
-          gradientBackgroundEnd="#180904"
-          blendingValue="screen"
+          gradientBackgroundStart="#1b0e07"
+          gradientBackgroundEnd="#120a05"
+          colors={["#ff6a00", "#ffd34d", "#ff9a1f", "#ff6a00", "#ffd34d"]}
+          blur={38}
+          opacity={0.8}
+          speed={1}
           interactive={false}
-          blobScale={1.6}
-          vignetteOpacity={0.4}
-          grainOpacity={0.1}
-          containerClassName="fixed inset-0 -z-10 pointer-events-none"
+          containerClassName="fixed inset-0 z-0 pointer-events-none"
         />
-        {children}
+        <div className="relative z-10">
+          {children}
+        </div>
       </body>
     </html>
   );
