@@ -117,6 +117,36 @@ export default function Page() {
   const weeklyTotal = sessions.reduce((acc, session) => acc + (session.durationMs || 0), 0);
   const weeklyMinutes = Math.floor(weeklyTotal / (1000 * 60));
 
+  // Calculate daily session data for the last 7 days
+  const getDailySessionData = () => {
+    const today = new Date();
+    const dailyData: number[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const targetDate = new Date(today);
+      targetDate.setDate(today.getDate() - i);
+      targetDate.setHours(0, 0, 0, 0);
+
+      const nextDate = new Date(targetDate);
+      nextDate.setDate(targetDate.getDate() + 1);
+
+      const dayTotal = sessions
+        .filter((session) => {
+          const sessionDate = new Date(session.timestamp);
+          return sessionDate >= targetDate && sessionDate < nextDate;
+        })
+        .reduce((acc, session) => acc + (session.durationMs || 0), 0);
+
+      // Convert to minutes
+      dailyData.push(Math.floor(dayTotal / (1000 * 60)));
+    }
+
+    return dailyData;
+  };
+
+  const dailySessionMinutes = getDailySessionData();
+  const maxDailyMinutes = Math.max(...dailySessionMinutes, 1); // Avoid division by zero
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -216,19 +246,26 @@ export default function Page() {
                   <h3 className="text-base font-medium">Sauna Time This Week</h3>
                   <span className="text-sm text-white/60">{weeklyMinutes} minutes • +12%</span>
                 </div>
-                {/* Simple bar chart mock */}
+                {/* Daily session bar chart */}
                 <div className="grid grid-cols-7 gap-2 pt-2">
-                  {[4, 6, 3, 5, 2, 7, 1].map((h, i) => (
-                    <div
-                      key={i}
-                      className="relative h-24 w-full overflow-hidden rounded-md bg-white/5"
-                    >
-                      <div
-                        className="absolute bottom-0 left-0 right-0 rounded-t-md bg-gradient-to-t from-amber-400/70 to-amber-200/30"
-                        style={{ height: `${h * 12}%` }}
-                      />
-                    </div>
-                  ))}
+                  {dailySessionMinutes.map((minutes, i) => {
+                    const heightPercent = maxDailyMinutes > 0 ? (minutes / maxDailyMinutes) * 100 : 0;
+                    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    const today = new Date();
+                    const dayIndex = (today.getDay() - 6 + i + 7) % 7;
+
+                    return (
+                      <div key={i} className="flex flex-col items-center gap-1">
+                        <div className="relative h-24 w-full overflow-hidden rounded-md bg-white/5">
+                          <div
+                            className="absolute bottom-0 left-0 right-0 rounded-t-md bg-gradient-to-t from-amber-400/70 to-amber-200/30"
+                            style={{ height: `${heightPercent}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-white/50">{dayLabels[dayIndex]}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </GlassCard>
             </EmberGlow>
