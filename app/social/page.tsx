@@ -59,25 +59,8 @@ export default function Page() {
             </Link>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-6 px-6 md:px-12 pb-10">
-          <Card className="border-white/10 bg-transparent p-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm text-white/70">View</div>
-              <div className="inline-flex rounded-md border border-white/10 p-1">
-                <SegmentedTab active={view === "leaderboard"} onClick={() => setView("leaderboard")}>
-                  Leaderboard
-                </SegmentedTab>
-                <SegmentedTab active={view === "graph"} onClick={() => setView("graph")}>
-                  Graph View
-                </SegmentedTab>
-              </div>
-            </div>
-          </Card>
-          {view === "leaderboard" ? (
-            <LeaderboardTable users={users} />
-          ) : (
-            <LeaderboardHeatBattle users={users} />
-          )}
+        <div className="px-6 md:px-12 pb-10"> 
+          <LeaderboardTable users={users} />
         </div>
       </SidebarInset>
     </SidebarProvider>
