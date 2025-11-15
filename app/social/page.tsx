@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/ui/glass-card";
+"use client";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   SidebarInset,
@@ -7,8 +7,33 @@ import {
 } from "@/components/ui/sidebar";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { LeaderboardTable } from "@/components/leaderboard/LeaderboardTable";
+import { LeaderboardGraph } from "@/components/leaderboard/LeaderboardGraph";
+import { LeaderboardHeatBattle } from "@/components/leaderboard/LeaderboardHeatBattle";
+import { leaderboard as leaderboardData } from "@/lib/data/leaderboard";
+import { cn } from "@/lib/utils";
+
+type ViewMode = "leaderboard" | "graph";
 
 export default function Page() {
+  const [view, setView] = React.useState<ViewMode>("leaderboard");
+
+  const users = React.useMemo(
+    () =>
+      leaderboardData.map((u) => ({
+        id: u.id,
+        name: u.name,
+        avatar: u.avatar,
+        maxTemp: u.maxTemp,
+        totalMinutes: u.totalMinutes,
+        streak: u.streak,
+      })),
+    []
+  );
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -35,14 +60,44 @@ export default function Page() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-6 px-6 md:px-12 pb-10">
-          <div className="grid gap-4 md:grid-cols-3">
-            <GlassCard className="p-6 h-40" />
-            <GlassCard className="p-6 h-40" />
-            <GlassCard className="p-6 h-40" />
-          </div>
+          <Card className="border-white/10 bg-transparent p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm text-white/70">View</div>
+              <div className="inline-flex rounded-md border border-white/10 p-1">
+                <SegmentedTab active={view === "leaderboard"} onClick={() => setView("leaderboard")}>
+                  Leaderboard
+                </SegmentedTab>
+                <SegmentedTab active={view === "graph"} onClick={() => setView("graph")}>
+                  Graph View
+                </SegmentedTab>
+              </div>
+            </div>
+          </Card>
+          {view === "leaderboard" ? (
+            <LeaderboardTable users={users} />
+          ) : (
+            <LeaderboardHeatBattle users={users} />
+          )}
         </div>
       </SidebarInset>
     </SidebarProvider>
+  );
+}
+
+function SegmentedTab(props: { active?: boolean; onClick?: () => void; children: React.ReactNode }) {
+  const { active, onClick, children } = props;
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={onClick}
+      className={cn(
+        "px-3 py-1 text-xs sm:text-sm",
+        active ? "bg-white/10 text-white" : "text-white/70 hover:text-white"
+      )}
+    >
+      {children}
+    </Button>
   );
 }
 
