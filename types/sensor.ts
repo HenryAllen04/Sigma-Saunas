@@ -142,3 +142,17 @@ export interface DeviceHealth {
   timeToTarget?: number;
   timestamp: string;
 }
+
+// Wearable data types
+export interface WearableData {
+  heartRate: number | null;
+  hrv: number | null;
+  respiratoryRate: number | null;
+  lastUpdated: string | null;
+}
+
+export interface WearableDataUpdate {
+  heartRate?: number;
+  hrv?: number;
+  respiratoryRate?: number;
+}
