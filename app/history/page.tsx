@@ -52,6 +52,8 @@ export default function Page() {
   const totalHours = Math.floor(totalMinutes / 60);
   const avgDuration = sessions.length > 0 ? totalDuration / sessions.length : 0;
   const avgMinutes = Math.floor(avgDuration / (1000 * 60));
+  const avgHours = Math.floor(avgMinutes / 60);
+  const avgRemainingMinutes = avgMinutes % 60;
 
   // Calculate max temp across all sessions
   const maxTemp = sessions.reduce((max, session) => {
@@ -92,8 +94,8 @@ export default function Page() {
               <GlassCard className="p-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-white/60">Total Sessions</p>
-                    <p className="text-3xl font-bold mt-2">{sessions.length}</p>
+                    <p className="text-sm font-semibold text-white/70">Total Sessions</p>
+                    <p className="text-3xl font-bold mt-2 text-orange-200">{sessions.length}</p>
                   </div>
                   <Calendar className="h-5 w-5 text-white/40" />
                 </div>
@@ -104,9 +106,10 @@ export default function Page() {
               <GlassCard className="p-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-white/60">Total Time</p>
-                    <p className="text-3xl font-bold mt-2">{totalHours}h</p>
-                    <p className="text-xs text-white/50">{totalMinutes % 60}min extra</p>
+                    <p className="text-sm font-semibold text-white/70">Total Time</p>
+                    <p className="text-3xl font-bold mt-2 text-orange-200">
+                      {totalHours}h {totalMinutes % 60}m
+                    </p>
                   </div>
                   <Clock className="h-5 w-5 text-white/40" />
                 </div>
@@ -117,8 +120,10 @@ export default function Page() {
               <GlassCard className="p-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-white/60">Avg Duration</p>
-                    <p className="text-3xl font-bold mt-2">{avgMinutes}m</p>
+                    <p className="text-sm font-semibold text-white/70">Avg Duration</p>
+                    <p className="text-3xl font-bold mt-2 text-orange-200">
+                      {avgHours > 0 ? `${avgHours}h ${avgRemainingMinutes}m` : `${avgRemainingMinutes}m`}
+                    </p>
                   </div>
                   <TrendingUp className="h-5 w-5 text-white/40" />
                 </div>
@@ -129,8 +134,8 @@ export default function Page() {
               <GlassCard className="p-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-white/60">Max Temp</p>
-                    <p className="text-3xl font-bold mt-2">{maxTemp.toFixed(0)}°C</p>
+                    <p className="text-sm font-semibold text-white/70">Max Temp</p>
+                    <p className="text-3xl font-bold mt-2 text-orange-200">{maxTemp.toFixed(0)}°C</p>
                   </div>
                   <Thermometer className="h-5 w-5 text-white/40" />
                 </div>
@@ -180,7 +185,7 @@ export default function Page() {
                               </span>
                             </div>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
                               <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4 text-white/40" />
                                 <div>
@@ -217,15 +222,6 @@ export default function Page() {
                                       {stats.hum.avg?.toFixed(1)}%
                                     </p>
                                   </div>
-                                </div>
-                              )}
-
-                              {session.type && (
-                                <div>
-                                  <p className="text-xs text-white/50">Type</p>
-                                  <p className="text-sm font-medium capitalize">
-                                    {session.type.toLowerCase()}
-                                  </p>
                                 </div>
                               )}
                             </div>
