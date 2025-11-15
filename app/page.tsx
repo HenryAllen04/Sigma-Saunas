@@ -29,6 +29,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Orb, type AgentState } from "@/components/ui/orb";
 
 // Memoized chart component to prevent re-renders when parent updates
 const HistoricalChart = memo(({ data }: { data: Array<{ time: string; temperature?: number; humidity?: number }> }) => {
@@ -117,6 +118,9 @@ export default function Page() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [agentState, setAgentState] = useState<AgentState>(null);
+  const [inputVolume, setInputVolume] = useState(0);
+  const [outputVolume, setOutputVolume] = useState(0);
 
   // Refs for voice agent
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -127,6 +131,12 @@ export default function Page() {
   const wearableDataRef = useRef<WearableData | null>(null);
   const sensorDataRef = useRef<LatestDataResponse | null>(null);
   const sessionDurationRef = useRef<number>(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const outputAnalyserRef = useRef<AnalyserNode | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const audioSourceCreatedRef = useRef<boolean>(false);
 
   // Fetch wearable data
   useEffect(() => {
@@ -360,6 +370,7 @@ export default function Page() {
     try {
       setLastGuidance(text);
       setIsSpeaking(true);
+      setAgentState("talking");
 
       if (recognitionRef.current && shouldListenRef.current) {
         try {
@@ -380,6 +391,7 @@ export default function Page() {
       if (!response.ok) {
         console.error("Failed to generate speech");
         setIsSpeaking(false);
+        setAgentState("listening");
         if (recognitionRef.current && shouldListenRef.current) {
           try {
             recognitionRef.current.start();
@@ -396,8 +408,36 @@ export default function Page() {
       if (audioRef.current) {
         audioRef.current.src = audioUrl;
 
+        // Setup audio context for output volume tracking (only once)
+        if (!audioContextRef.current) {
+          audioContextRef.current = new AudioContext();
+        }
+
+        if (!audioSourceCreatedRef.current && audioRef.current) {
+          const source = audioContextRef.current.createMediaElementSource(audioRef.current);
+          const analyser = audioContextRef.current.createAnalyser();
+          analyser.fftSize = 256;
+          source.connect(analyser);
+          analyser.connect(audioContextRef.current.destination);
+          outputAnalyserRef.current = analyser;
+          audioSourceCreatedRef.current = true;
+        }
+
+        const trackOutputVolume = () => {
+          if (!outputAnalyserRef.current) return;
+          const dataArray = new Uint8Array(outputAnalyserRef.current.frequencyBinCount);
+          outputAnalyserRef.current.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+          setOutputVolume(Math.min(1, average / 128)); // Normalize to 0-1
+          if (audioRef.current && !audioRef.current.paused) {
+            requestAnimationFrame(trackOutputVolume);
+          }
+        };
+
         audioRef.current.onended = () => {
           setIsSpeaking(false);
+          setAgentState("listening");
+          setOutputVolume(0);
           if (recognitionRef.current && shouldListenRef.current) {
             setTimeout(() => {
               try {
@@ -410,10 +450,13 @@ export default function Page() {
         };
 
         audioRef.current.play();
+        trackOutputVolume();
       }
     } catch (error) {
       console.error("Error speaking guidance:", error);
       setIsSpeaking(false);
+      setAgentState("listening");
+      setOutputVolume(0);
       if (recognitionRef.current && shouldListenRef.current) {
         try {
           recognitionRef.current.start();
@@ -437,6 +480,7 @@ export default function Page() {
     }
 
     setIsProcessing(true);
+    setAgentState("thinking");
 
     if (recognitionRef.current && shouldListenRef.current) {
       try {
@@ -510,10 +554,40 @@ export default function Page() {
     }
   };
 
-  const startSession = () => {
+  const startSession = async () => {
     setSessionActive(true);
     setSessionDuration(0);
     shouldListenRef.current = true;
+    setAgentState("listening");
+
+    // Setup microphone for input volume tracking
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micStreamRef.current = stream;
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      const analyser = audioContextRef.current.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      const trackInputVolume = () => {
+        if (!analyserRef.current || !sessionActive) return;
+        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        setInputVolume(Math.min(1, average / 128)); // Normalize to 0-1
+        animationFrameRef.current = requestAnimationFrame(trackInputVolume);
+      };
+
+      trackInputVolume();
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+    }
 
     if (recognitionRef.current) {
       try {
@@ -534,6 +608,21 @@ export default function Page() {
     setSessionActive(false);
     setSessionDuration(0);
     shouldListenRef.current = false;
+    setAgentState(null);
+    setInputVolume(0);
+    setOutputVolume(0);
+
+    // Stop microphone stream
+    if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach(track => track.stop());
+      micStreamRef.current = null;
+    }
+
+    // Cancel animation frame
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
 
     if (recognitionRef.current) {
       try {
@@ -634,47 +723,49 @@ export default function Page() {
           <EmberGlow className="mt-2 w-full">
             <GlassCard className="p-6 md:p-10">
               <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-3">
-                <div className="col-span-2 space-y-4">
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2 text-4xl font-bold">
-                      <Thermometer className="h-8 w-8 text-white/70" />
-                      <span className="drop-shadow-[0_0_20px_rgba(255,200,60,0.35)]">
-                        {sensorData?.data?.temp !== undefined
-                          ? `${sensorData.data.temp.toFixed(1)}°C`
-                          : "--"}
-                      </span>
+                {!sessionActive && (
+                  <div className="col-span-2 space-y-4">
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2 text-4xl font-bold">
+                        <Thermometer className="h-8 w-8 text-white/70" />
+                        <span className="drop-shadow-[0_0_20px_rgba(255,200,60,0.35)]">
+                          {sensorData?.data?.temp !== undefined
+                            ? `${sensorData.data.temp.toFixed(1)}°C`
+                            : "--"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-2xl font-semibold text-white/80">
+                        <Droplets className="h-6 w-6 text-white/60" />
+                        <span>
+                          {sensorData?.data?.hum !== undefined
+                            ? `${sensorData.data.hum.toFixed(1)}%`
+                            : "--"}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-2xl font-semibold text-white/80">
-                      <Droplets className="h-6 w-6 text-white/60" />
+                    <div className="flex items-center gap-2 text-white/80">
+                      <User
+                        className={`h-5 w-5 ${
+                          sensorData?.data?.presence && sensorData.data.presence > 0
+                            ? "text-green-300/80"
+                            : "text-white/40"
+                        }`}
+                      />
                       <span>
-                        {sensorData?.data?.hum !== undefined
-                          ? `${sensorData.data.hum.toFixed(1)}%`
+                        {sensorData?.data?.presence !== undefined
+                          ? sensorData.data.presence > 0
+                            ? "Someone present"
+                            : "No one present"
                           : "--"}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-white/80">
-                    <User
-                      className={`h-5 w-5 ${
-                        sensorData?.data?.presence && sensorData.data.presence > 0
-                          ? "text-green-300/80"
-                          : "text-white/40"
-                      }`}
-                    />
-                    <span>
-                      {sensorData?.data?.presence !== undefined
-                        ? sensorData.data.presence > 0
-                          ? "Someone present"
-                          : "No one present"
-                        : "--"}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex md:justify-end">
+                )}
+                <div className={`flex ${sessionActive ? 'col-span-3 justify-center' : 'md:justify-end'}`}>
                   {!sessionActive ? (
                     <Button
                       onClick={startSession}
-                      className="rounded-xl bg-white/20 px-6 py-3 text-sm font-medium text-white hover:bg-white/25 backdrop-blur-md border-0"
+                      className="rounded-xl bg-orange-500/80 px-6 py-3 text-sm font-medium text-white hover:bg-orange-600/90 backdrop-blur-md border-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_0_1px_rgba(255,255,255,0.08)] active:shadow-[inset_0_2px_8px_rgba(0,0,0,0.4),inset_0_-1px_0_rgba(255,255,255,0.04),0_0_0_1px_rgba(255,255,255,0.08)] transition-all"
                     >
                       <Play className="h-4 w-4 mr-2" />
                       Start Session
@@ -694,8 +785,24 @@ export default function Page() {
             </GlassCard>
           </EmberGlow>
 
+          {/* Orb Display - shown only when session is active */}
+          {sessionActive && (
+            <div className="w-full h-[500px] flex items-center justify-center">
+              <div className="w-full max-w-2xl h-full">
+                <Orb
+                  colors={["#FF9A1F", "#FFC470"]}
+                  agentState={agentState}
+                  volumeMode="manual"
+                  manualInput={inputVolume}
+                  manualOutput={outputVolume}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Lower grid: Weekly Progress & Insight */}
-          <div className="grid gap-6 md:grid-cols-3 md:items-stretch">
+          {!sessionActive && (
+            <div className="grid gap-6 md:grid-cols-3 md:items-stretch">
             {/* Weekly Progress */}
             <EmberGlow className="md:col-span-2 h-full">
               <GlassCard className="p-5 h-full">
@@ -775,20 +882,23 @@ export default function Page() {
               </GlassCard>
             </EmberGlow>
           </div>
+          )}
 
           {/* Historical Chart */}
-          <EmberGlow className="w-full">
-            <GlassCard className="p-5">
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-medium">Last 24 Hours</h3>
-                  <p className="text-sm text-white/60">Temperature & humidity</p>
+          {!sessionActive && (
+            <EmberGlow className="w-full">
+              <GlassCard className="p-5">
+                <div className="mb-3 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-base font-medium">Last 24 Hours</h3>
+                    <p className="text-sm text-white/60">Temperature & humidity</p>
+                  </div>
+                  <Activity className="h-5 w-5 text-white/40" />
                 </div>
-                <Activity className="h-5 w-5 text-white/40" />
-              </div>
-              <HistoricalChart data={chartData} />
-            </GlassCard>
-          </EmberGlow>
+                <HistoricalChart data={chartData} />
+              </GlassCard>
+            </EmberGlow>
+          )}
 
           {/* Session controls and conversation */}
           {sessionActive && (

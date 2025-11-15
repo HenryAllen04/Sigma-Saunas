@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
     // Temperature/heat questions
     else if (lowerQuestion.includes("temperature") || lowerQuestion.includes("hot") || lowerQuestion.includes("heat")) {
       if (saunaData.temperature > 85) {
-        response = `The sauna is at ${saunaData.temperature} degrees Celsius, which is quite hot. Make sure you're comfortable and don't hesitate to step out if needed.`
+        response = `The sauna is at ${saunaData.temperature.toFixed(1)} degrees Celsius, which is quite hot. Make sure you're comfortable and don't hesitate to step out if needed.`
       } else {
-        response = `The sauna is at ${saunaData.temperature} degrees with ${saunaData.humidity}% humidity. This is a comfortable temperature for most people.`
+        response = `The sauna is at ${saunaData.temperature.toFixed(1)} degrees with ${saunaData.humidity}% humidity. This is a comfortable temperature for most people.`
       }
     }
     // Duration/time questions
@@ -40,17 +40,17 @@ export async function POST(request: NextRequest) {
     // Safety/danger questions
     else if (lowerQuestion.includes("die") || lowerQuestion.includes("death") || lowerQuestion.includes("danger")) {
       if (healthData.heartRate > 120 || saunaData.temperature > 90) {
-        response = `Your heart rate is ${healthData.heartRate} and temperature is ${saunaData.temperature} degrees, which is elevated. You should exit the sauna now and cool down. You're not in immediate danger but it's important to listen to your body.`
+        response = `Your heart rate is ${healthData.heartRate} and temperature is ${saunaData.temperature.toFixed(1)} degrees, which is elevated. You should exit the sauna now and cool down. You're not in immediate danger but it's important to listen to your body.`
       } else {
-        response = `You're completely safe. Your heart rate is ${healthData.heartRate} and the sauna is ${saunaData.temperature} degrees. These are normal levels. You're doing fine.`
+        response = `You're completely safe. Your heart rate is ${healthData.heartRate} and the sauna is ${saunaData.temperature.toFixed(1)} degrees. These are normal levels. You're doing fine.`
       }
     }
     // Safety questions
     else if (lowerQuestion.includes("safe") || lowerQuestion.includes("okay") || lowerQuestion.includes("good") || lowerQuestion.includes("alright") || lowerQuestion.includes("fine")) {
       if (healthData.heartRate > 120 || saunaData.temperature > 90) {
-        response = `Your metrics show some elevation. Heart rate is ${healthData.heartRate} and temperature is ${saunaData.temperature} degrees. Consider taking a break soon.`
+        response = `Your metrics show some elevation. Heart rate is ${healthData.heartRate} and temperature is ${saunaData.temperature.toFixed(1)} degrees. Consider taking a break soon.`
       } else {
-        response = `You're doing great! Your heart rate is ${healthData.heartRate} and the sauna is at ${saunaData.temperature} degrees. All metrics look good.`
+        response = `You're doing great! Your heart rate is ${healthData.heartRate} and the sauna is at ${saunaData.temperature.toFixed(1)} degrees. All metrics look good.`
       }
     }
     // Continue questions
@@ -67,11 +67,11 @@ export async function POST(request: NextRequest) {
     }
     // Care/help
     else if (lowerQuestion.includes("care") || lowerQuestion.includes("help")) {
-      response = `I'm here to monitor your session and keep you safe. Your heart rate is ${healthData.heartRate}, sauna is ${saunaData.temperature} degrees. You can ask me about your metrics, duration, or if it's safe to continue.`
+      response = `I'm here to monitor your session and keep you safe. Your heart rate is ${healthData.heartRate}, sauna is ${saunaData.temperature.toFixed(1)} degrees. You can ask me about your metrics, duration, or if it's safe to continue.`
     }
     // General/default
     else {
-      response = `Your current stats: heart rate is ${healthData.heartRate}, sauna temperature is ${saunaData.temperature} degrees. You're ${Math.floor(sessionDuration / 60)} minutes in. Feel free to ask about your safety, metrics, or how long to stay.`
+      response = `Your current stats: heart rate is ${healthData.heartRate}, sauna temperature is ${saunaData.temperature.toFixed(1)} degrees. You're ${Math.floor(sessionDuration / 60)} minutes in. Feel free to ask about your safety, metrics, or how long to stay.`
     }
 
     return NextResponse.json({ response })
