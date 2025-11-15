@@ -132,19 +132,19 @@
 @layer components {
   /* Reusable dark glass surface */
   .surface-glass {
-    @apply rounded-xl border border-white/10 bg-white/[0.04] text-white/90 backdrop-blur-md;
-    /* Subtle top-left highlight and soft outer edge */
+    @apply rounded-xl border border-white/5 bg-black/50 text-white/90 backdrop-blur-md;
+    /* Subtle top-left highlight and deeper outer edge for darker surface */
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  .surface-glass:hover {
+    @apply bg-black/60 backdrop-blur-lg;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.06),
       0 0 0 1px rgba(255, 255, 255, 0.08),
-      0 10px 30px rgba(0, 0, 0, 0.35);
-  }
-  .surface-glass:hover {
-    @apply bg-white/[0.06] backdrop-blur-lg;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 0 0 1px rgba(255, 255, 255, 0.10),
-      0 14px 36px rgba(0, 0, 0, 0.45);
+      0 14px 36px rgba(0, 0, 0, 0.55);
   }
   .surface-glass:active {
     /* Pressed-in (neumorphic) effect */

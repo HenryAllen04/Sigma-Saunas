@@ -23,14 +23,15 @@ export default function RootLayout({
           gradientBackgroundEnd="#120a05"
           colors={["#ff6a00", "#ffd34d", "#ff9a1f", "#ff6a00", "#ffd34d"]}
           blur={40}
-          opacity={0.75}
+          opacity={0.6}
           speed={1}
           interactive={false}
           extraBlobs={12}
           blobScale={1.2}
           containerClassName="fixed inset-0 z-0 pointer-events-none"
         />
-        <div className="relative z-10">
+        <div className="fixed inset-0 z-10 pointer-events-none bg-[#ff6a00]/20" />
+        <div className="relative z-20">
           {children}
         </div>
       </body>
