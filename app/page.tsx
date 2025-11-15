@@ -128,7 +128,7 @@ export default function Page() {
               <div className="hidden md:block h-6 w-px bg-white/10" />
               <div>
                 <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
-                  Good evening, Alex
+                  Good evening, Perttu
                 </h1>
                 <p className="text-sm text-white/60">Ready for a session?</p>
               </div>
