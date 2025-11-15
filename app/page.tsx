@@ -144,7 +144,7 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-6 px-6 md:px-12 pb-10">
           {/* Live Status Card */}
-          <EmberGlow className="mx-auto mt-2 w-full max-w-5xl">
+          <EmberGlow className="mt-2 w-full">
             <GlassCard className="p-6 md:p-10">
               <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-3">
                 <div className="col-span-2 space-y-4">
