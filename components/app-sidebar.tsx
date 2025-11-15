@@ -3,18 +3,12 @@
 import * as React from "react"
 import {
   AudioLines,
-  BookOpen,
-  Bot,
   Command,
-  Compass,
-  Flame,
   History,
   LifeBuoy,
   Send,
-  Settings2,
   SquareTerminal,
   Trophy,
-  User,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -39,45 +33,9 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/dashboard",
+      url: "/",
       icon: SquareTerminal,
       isActive: true,
-    },
-    {
-      title: "Live Session",
-      url: "/live",
-      icon: Flame,
-    },
-    {
-      title: "Guided Sessions",
-      url: "/guided",
-      icon: Compass,
-      items: [
-        {
-          title: "Traditional",
-          url: "/guided/traditional",
-        },
-        {
-          title: "Zen",
-          url: "/guided/zen",
-        },
-        {
-          title: "Recovery",
-          url: "/guided/recovery",
-        },
-        {
-          title: "Coding Mode",
-          url: "/guided/coding-mode",
-        },
-        {
-          title: "Corporate",
-          url: "/guided/corporate",
-        },
-        {
-          title: "Beginner Safe Mode",
-          url: "/guided/beginner",
-        },
-      ],
     },
     {
       title: "Session History",
@@ -93,40 +51,6 @@ const data = {
         { title: "All-Time", url: "/social?tab=all-time" },
         { title: "Streaks", url: "/social?tab=streaks" },
         { title: "Friends Only", url: "/social?tab=friends" },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
-      items: [
-        {
-          title: "Profile",
-          url: "/settings/profile",
-        },
-        {
-          title: "Integrations",
-          url: "/settings/integrations",
-        },
-        {
-          title: "Notifications",
-          url: "/settings/notifications",
-        },
-        {
-          title: "Safety",
-          url: "/settings/safety",
-        },
-      ],
-    },
-    {
-      title: "User Account",
-      url: "/account",
-      icon: User,
-      items: [
-        {
-          title: "Subscription",
-          url: "/account/subscription",
-        },
       ],
     },
     {
