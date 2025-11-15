@@ -674,7 +674,7 @@ export default function Page() {
                   {!sessionActive ? (
                     <Button
                       onClick={startSession}
-                      className="rounded-xl bg-white/20 px-6 py-3 text-sm font-medium text-white hover:bg-white/25 backdrop-blur-md border-0"
+                      className="rounded-xl bg-orange-500/80 px-6 py-3 text-sm font-medium text-white hover:bg-orange-600/90 backdrop-blur-md border-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_0_1px_rgba(255,255,255,0.08)] active:shadow-[inset_0_2px_8px_rgba(0,0,0,0.4),inset_0_-1px_0_rgba(255,255,255,0.04),0_0_0_1px_rgba(255,255,255,0.08)] transition-all"
                     >
                       <Play className="h-4 w-4 mr-2" />
                       Start Session
