@@ -19,7 +19,7 @@ export default function Page() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="bg-transparent">
+      <SidebarInset>
         <header className="flex h-20 shrink-0 items-center">
           <div className="flex w-full items-center justify-between px-6 md:px-12">
             <div className="flex items-center gap-3">
