@@ -609,7 +609,24 @@ export default function Page() {
                 <p className="text-sm text-white/60">Ready for a session?</p>
               </div>
             </div>
-            
+
+            {/* Heart rate pill */}
+            <EmberGlow className="rounded-full">
+              <GlassCard className="rounded-full px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <Heart className="h-4 w-4 text-rose-300" />
+                  <span className="text-sm">
+                    {wearableData?.heartRate ? `${wearableData.heartRate} bpm` : "-- bpm"}
+                  </span>
+                  {wearableData?.hrv && (
+                    <>
+                      <span className="mx-2 text-white/30">•</span>
+                      <span className="text-sm text-white/80">HRV: {wearableData.hrv}ms</span>
+                    </>
+                  )}
+                </div>
+              </GlassCard>
+            </EmberGlow>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-6 px-6 md:px-12 pb-10">
@@ -677,60 +694,79 @@ export default function Page() {
             </GlassCard>
           </EmberGlow>
 
-          {/* Heart rate pill */}
-          <EmberGlow className="rounded-full w-fit">
-            <GlassCard className="rounded-full px-5 py-3">
-              <div className="flex items-center gap-3">
-                <Heart className="h-4 w-4 text-rose-300" />
-                <span className="text-sm">
-                  {wearableData?.heartRate ? `${wearableData.heartRate} bpm` : "-- bpm"}
-                </span>
-                {wearableData?.hrv && (
-                  <>
-                    <span className="mx-2 text-white/30">•</span>
-                    <span className="text-sm text-white/80">HRV: {wearableData.hrv}ms</span>
-                  </>
-                )}
-              </div>
-            </GlassCard>
-          </EmberGlow>
-
           {/* Lower grid: Weekly Progress & Insight */}
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3 md:items-stretch">
             {/* Weekly Progress */}
-            <EmberGlow className="md:col-span-2">
-              <GlassCard className="p-5">
+            <EmberGlow className="md:col-span-2 h-full">
+              <GlassCard className="p-5 h-full">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="text-base font-medium">Sauna Time This Week</h3>
                   <span className="text-sm text-white/60">{weeklyMinutes} minutes • +12%</span>
                 </div>
-                {/* Daily session bar chart */}
-                <div className="grid grid-cols-7 gap-2 pt-2">
-                  {dailySessionMinutes.map((minutes, i) => {
-                    const heightPercent = maxDailyMinutes > 0 ? (minutes / maxDailyMinutes) * 100 : 0;
-                    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                    const today = new Date();
-                    const dayIndex = (today.getDay() - 6 + i + 7) % 7;
+                <div className="grid grid-cols-1 md:grid-cols-[1fr,200px] gap-6">
+                  {/* Daily session bar chart */}
+                  <div className="grid grid-cols-7 gap-2 pt-2">
+                    {dailySessionMinutes.map((minutes, i) => {
+                      const heightPercent = maxDailyMinutes > 0 ? (minutes / maxDailyMinutes) * 100 : 0;
+                      const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                      const today = new Date();
+                      const dayIndex = (today.getDay() - 6 + i + 7) % 7;
 
-                    return (
-                      <div key={i} className="flex flex-col items-center gap-1">
-                        <div className="relative h-24 w-full overflow-hidden rounded-md bg-white/5">
-                          <div
-                            className="absolute bottom-0 left-0 right-0 rounded-t-md bg-gradient-to-t from-amber-400/70 to-amber-200/30"
-                            style={{ height: `${heightPercent}%` }}
-                          />
+                      return (
+                        <div key={i} className="flex flex-col items-center gap-1">
+                          <div className="relative h-24 w-full overflow-hidden rounded-md bg-white/5">
+                            <div
+                              className="absolute bottom-0 left-0 right-0 rounded-t-md bg-gradient-to-t from-amber-400/70 to-amber-200/30"
+                              style={{ height: `${heightPercent}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-white/50">{dayLabels[dayIndex]}</span>
                         </div>
-                        <span className="text-xs text-white/50">{dayLabels[dayIndex]}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+
+                  {/* Sessions Summary */}
+                  <div className="space-y-4 border-l border-white/10 pl-6">
+                    <div>
+                      <p className="text-3xl font-bold">{weeklyMinutes} min</p>
+                      <p className="text-sm text-white/60">{sessions.length} sessions</p>
+                    </div>
+                    {sessions.slice(0, 3).map((session) => {
+                      const stats = session.stats ? JSON.parse(session.stats as string) : {};
+                      return (
+                        <div
+                          key={session.sessionId}
+                          className="border-t border-white/10 pt-3"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-white/80">
+                              {formatDuration(session.durationMs)}
+                            </span>
+                            {stats.temp && (
+                              <span className="text-sm text-white/60">
+                                {stats.temp.max?.toFixed(0)}°C
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-white/50 mt-0.5">
+                            {new Date(session.timestamp).toLocaleDateString([], {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </GlassCard>
             </EmberGlow>
 
             {/* AI Coach */}
-            <EmberGlow>
-              <GlassCard className="p-5">
+            <EmberGlow className="flex h-full">
+              <GlassCard className="p-5 flex-1 h-full">
                 <h3 className="mb-2 text-base font-medium">Insight of the Day</h3>
                 <p className="text-sm text-white/80">
                   Your HRV improved after yesterday's session. A gentle 12-minute
@@ -740,62 +776,19 @@ export default function Page() {
             </EmberGlow>
           </div>
 
-          {/* Lower grid: Chart & Sessions */}
-          <div className="grid gap-6 md:grid-cols-3">
-            {/* Historical Chart */}
-            <EmberGlow className="md:col-span-2">
-              <GlassCard className="p-5">
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-base font-medium">Last 24 Hours</h3>
-                    <p className="text-sm text-white/60">Temperature & humidity</p>
-                  </div>
-                  <Activity className="h-5 w-5 text-white/40" />
+          {/* Historical Chart */}
+          <EmberGlow className="w-full">
+            <GlassCard className="p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-medium">Last 24 Hours</h3>
+                  <p className="text-sm text-white/60">Temperature & humidity</p>
                 </div>
-                <HistoricalChart data={chartData} />
-              </GlassCard>
-            </EmberGlow>
-
-            {/* Sessions Summary */}
-            <EmberGlow>
-              <GlassCard className="p-5">
-                <h3 className="mb-2 text-base font-medium">This Week</h3>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-3xl font-bold">{weeklyMinutes} min</p>
-                    <p className="text-sm text-white/60">{sessions.length} sessions</p>
-                  </div>
-                  {sessions.slice(0, 3).map((session) => {
-                    const stats = session.stats ? JSON.parse(session.stats as string) : {};
-                    return (
-                      <div
-                        key={session.sessionId}
-                        className="border-t border-white/10 pt-3"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-white/80">
-                            {formatDuration(session.durationMs)}
-                          </span>
-                          {stats.temp && (
-                            <span className="text-sm text-white/60">
-                              {stats.temp.max?.toFixed(0)}°C
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-white/50 mt-0.5">
-                          {new Date(session.timestamp).toLocaleDateString([], {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </GlassCard>
-            </EmberGlow>
-          </div>
+                <Activity className="h-5 w-5 text-white/40" />
+              </div>
+              <HistoricalChart data={chartData} />
+            </GlassCard>
+          </EmberGlow>
 
           {/* Session controls and conversation */}
           {sessionActive && (
