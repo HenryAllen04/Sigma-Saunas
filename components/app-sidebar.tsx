@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  AudioLines,
   BookOpen,
   Bot,
   Command,
@@ -116,6 +117,29 @@ const data = {
         },
         {
           title: "Limits",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Voice",
+      url: "/voice",
+      icon: AudioLines,
+      items: [
+        {
+          title: "Start Session",
+          url: "/voice",
+        },
+        {
+          title: "Recordings",
+          url: "#",
+        },
+        {
+          title: "Transcripts",
+          url: "#",
+        },
+        {
+          title: "Analytics",
           url: "#",
         },
       ],
