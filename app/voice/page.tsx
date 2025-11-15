@@ -183,12 +183,12 @@ export default function VoicePage() {
     }
 
     if (sauna.temperature > 85) {
-      return `The sauna temperature is now ${sauna.temperature} degrees Celsius. This is getting quite hot. Make sure you're staying hydrated.`
+      return `The sauna temperature is now ${sauna.temperature.toFixed(2)} degrees Celsius. This is getting quite hot. Make sure you're staying hydrated.`
     }
 
     // Duration-based guidance
     if (duration === 0) {
-      return `Welcome to your sauna session. The temperature is ${sauna.temperature} degrees with ${sauna.humidity} percent humidity. Your current heart rate is ${health.heartRate}. Take slow, deep breaths and relax.`
+      return `Welcome to your sauna session. The temperature is ${sauna.temperature.toFixed(2)} degrees with ${sauna.humidity.toFixed(2)} percent humidity. Your current heart rate is ${health.heartRate}. Take slow, deep breaths and relax.`
     }
 
     if (duration === 60) {
@@ -196,7 +196,7 @@ export default function VoicePage() {
     }
 
     if (duration === 180) {
-      return `Three minutes in. You're doing great. Your heart rate has increased to ${health.heartRate}, which is normal. The sauna is at ${sauna.temperature} degrees.`
+      return `Three minutes in. You're doing great. Your heart rate has increased to ${health.heartRate}, which is normal. The sauna is at ${sauna.temperature.toFixed(2)} degrees.`
     }
 
     if (duration === 300) {
