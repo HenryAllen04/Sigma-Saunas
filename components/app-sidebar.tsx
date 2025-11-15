@@ -45,7 +45,7 @@ const data = {
     },
     {
       title: "Live Session",
-      url: "/",
+      url: "/live",
       icon: Flame,
     },
     {
