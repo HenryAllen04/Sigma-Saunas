@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { GlassCard } from "@/components/ui/glass-card";
 import { EmberGlow } from "@/components/ui/ember-glow";
-import { Thermometer, Droplets, User, Sparkles, Activity, Heart } from "lucide-react";
+import { Thermometer, Droplets, User, Sparkles, Activity, Heart, Brain } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -270,14 +270,35 @@ export default function Page() {
               </GlassCard>
             </EmberGlow>
 
-            {/* AI Coach */}
+            {/* AI Coach - Powered by Gemini */}
             <EmberGlow>
-              <GlassCard className="p-5">
-                <h3 className="mb-2 text-base font-medium">Insight of the Day</h3>
-                <p className="text-sm text-white/80">
-                  Your HRV improved after yesterday's session. A gentle 12-minute
-                  zen heat today would help recovery.
-                </p>
+              <GlassCard className="p-5 relative overflow-hidden">
+                {/* Gradient background accent */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-orange-500/20 blur-3xl" />
+                
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500/20 to-purple-600/20">
+                      <Brain className="h-5 w-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-medium">AI Sauna Coach</h3>
+                      <p className="text-xs text-white/50">Powered by Gemini</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-white/80 mb-4">
+                    Get personalized insights, safety guidance, and optimization tips based on your session data.
+                  </p>
+                  
+                  <Link
+                    href="/ai-coach"
+                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500/80 to-purple-600/80 hover:from-orange-500 hover:to-purple-600 px-4 py-2 text-sm font-medium text-white backdrop-blur-md transition-all"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Chat with AI Coach
+                  </Link>
+                </div>
               </GlassCard>
             </EmberGlow>
           </div>
