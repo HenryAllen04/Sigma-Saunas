@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { GlassCard } from "@/components/ui/glass-card";
 import { EmberGlow } from "@/components/ui/ember-glow";
-import { Thermometer, Droplets, User, Activity, Heart, Mic, Square, Play } from "lucide-react";
+import { Thermometer, Droplets, User, Activity, Heart, Mic, Square, Brain, Play } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef, useMemo, memo } from "react";
 import {
