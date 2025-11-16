@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   AudioLines,
+  Brain,
   Command,
   History,
   LifeBuoy,
@@ -39,6 +40,11 @@ const data = {
       title: "Session History",
       url: "/history",
       icon: History,
+    },
+    {
+      title: "AI Sauna Coach",
+      url: "/ai-coach",
+      icon: Brain,
     },
     {
       title: "Social & Leaderboard",
