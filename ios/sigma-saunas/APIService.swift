@@ -117,6 +117,54 @@ struct SessionSuggestion: Codable {
     }
 }
 
+// MARK: - Wearable Data Models
+
+struct WearableDataRequest: Codable {
+    let heartRate: Double?
+    let hrv: Double?
+    let respiratoryRate: Double?
+    
+    enum CodingKeys: String, CodingKey {
+        case heartRate = "heartRate"
+        case hrv = "hrv"
+        case respiratoryRate = "respiratoryRate"
+    }
+}
+
+struct WearableDataResponse: Codable {
+    let heartRate: Double?
+    let hrv: Double?
+    let respiratoryRate: Double?
+    let lastUpdated: Date?
+    
+    enum CodingKeys: String, CodingKey {
+        case heartRate = "heartRate"
+        case hrv = "hrv"
+        case respiratoryRate = "respiratoryRate"
+        case lastUpdated = "lastUpdated"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        heartRate = try container.decodeIfPresent(Double.self, forKey: .heartRate)
+        hrv = try container.decodeIfPresent(Double.self, forKey: .hrv)
+        respiratoryRate = try container.decodeIfPresent(Double.self, forKey: .respiratoryRate)
+        
+        if let lastUpdatedString = try? container.decodeIfPresent(String.self, forKey: .lastUpdated) {
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            lastUpdated = formatter.date(from: lastUpdatedString)
+        } else {
+            lastUpdated = nil
+        }
+    }
+}
+
+struct WearableDataPostResponse: Codable {
+    let success: Bool
+    let data: WearableDataResponse
+}
+
 // MARK: - API Service
 
 class APIService: ObservableObject {
@@ -394,6 +442,59 @@ class APIService: ObservableObject {
         
         let decoder = JSONDecoder()
         return try decoder.decode(SessionHistoryResponse.self, from: data)
+    }
+    
+    // MARK: - Wearable Data
+    
+    func getWearableData() async throws -> WearableDataResponse {
+        guard let url = URL(string: "\(baseURL)/api/wearable/data") else {
+            throw APIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.httpError(httpResponse.statusCode)
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode(WearableDataResponse.self, from: data)
+    }
+    
+    func postWearableData(_ data: WearableDataRequest) async throws -> WearableDataPostResponse {
+        guard let url = URL(string: "\(baseURL)/api/wearable/data") else {
+            throw APIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let encoder = JSONEncoder()
+        request.httpBody = try encoder.encode(data)
+        
+        let (responseData, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let errorString = String(data: responseData, encoding: .utf8) ?? "Unknown error"
+            print("Wearable data API error: \(httpResponse.statusCode) - \(errorString)")
+            throw APIError.httpError(httpResponse.statusCode)
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode(WearableDataPostResponse.self, from: responseData)
     }
     
     // MARK: - Health Check
